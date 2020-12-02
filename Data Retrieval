@@ -1,0 +1,164 @@
+#include <string>
+#include <fstream>
+#include <iostream>
+#include <vector>
+using namespace std;
+
+class Movie
+{
+private:
+    string movieID, title, datePub, genre, desc, vote, duration, country, language;
+    vector<string> actors; // make an Actor class for actor objects that store the movies they play in and info
+    vector<string> directors;
+public:
+    Movie(string _movieID, string _title, string _datePub, string _genre, string _desc);
+    Movie() {}
+    void addActor(string _actor) { actors.push_back(_actor); }
+    void addDirector(string _director) { directors.push_back(_director); }
+    void setID(string _movieID) { movieID = _movieID; }
+    void setTitle(string _title) { title = _title; }
+    void setDate(string _datePub) { datePub = _datePub; }
+    void setGenre(string _genre) { genre = _genre; }
+    void setDesc(string _desc) { desc = _desc; }
+    void setDirectors(vector<string> directors);
+    void setVote(string _vote) { vote = _vote; }
+    void setDuration(string _duration) { duration = _duration; }
+    void setCountry(string _country) { country = _country; }
+    void setLanguage(string _language) { language = _language; }
+    string getTitle() { return title; }
+    string getDate() { return datePub; }
+    string getGenre() { return genre; }
+    string getDesc() { return desc; }
+    string getVote() { return vote; }
+    string getDuration() { return duration; }
+    string getCountry() { return country; }
+    string getLanguage() { return language; }
+    vector<string> getActors() { return actors; }
+    vector<string> getDirectors() { return directors; }
+};
+
+void checkActors(vector<string>& actorList, string _name);
+void checkDirectors(vector<string>& directorList, string _name);
+int main()
+{
+
+    ifstream file;
+    string header, line;
+    string ID, title, datePub, genre, actorLine, dirLine, desc, vote, duration, country, language, director;
+    string nameID, alias, name, bio, dob;
+    vector<string> directorList;
+    vector<Movie> movieList;
+    vector<string> actorList;
+
+    file.open("Movie_Files/IMDb movies.txt");
+
+    getline(file, header);
+    cout << header << endl;
+    while (getline(file, line)) {
+        Movie movie;
+        cout << endl;
+        ID = line.substr(0, line.find('\t')); // gets title ID: may not be necessary
+        line = line.substr(line.find('\t') + 1);
+        movie.setID(ID);
+
+        title = line.substr(0, line.find('\t')); // gets title
+        line = line.substr(line.find('\t') + 1);
+        movie.setTitle(title);
+
+        datePub = line.substr(0, line.find('\t')); // gets date published
+        line = line.substr(line.find('\t') + 1);
+        movie.setDate(datePub);
+
+        genre = line.substr(0, line.find('\t')); // gets genre
+        line = line.substr(line.find('\t') + 1);
+        movie.setGenre(genre);
+
+        actorLine = line.substr(0, line.find('\t')); // separate into distinct actor strings and input into vector
+        while (actorLine.find(',') != -1) {
+            name = actorLine.substr(0, actorLine.find(','));
+            checkActors(actorList, name);
+            movie.addActor(name);
+            cout << name << endl;
+            actorLine = actorLine.substr(actorLine.find(',') + 2);
+        }
+        name = actorLine.substr(0, actorLine.find('\t'));
+        checkActors(actorList, name);
+        movie.addActor(name);
+        cout << name << endl;
+        line = line.substr(line.find('\t') + 1);
+
+        desc = line.substr(0, line.find('\t')); // gets description
+        line = line.substr(line.find('\t') + 1); // .find(string) gives the first index of the string, so you must increment accordingly
+        movie.setDesc(desc);
+
+        vote = line.substr(0, line.find('\t')); // gets vote
+        line = line.substr(line.find('\t') + 1);
+        movie.setVote(vote);
+
+        duration = line.substr(0, line.find('\t')); // gets duration
+        line = line.substr(line.find('\t') + 1);
+        movie.setDuration(duration);
+
+        country = line.substr(0, line.find('\t')); // gets country
+        line = line.substr(line.find('\t') + 1);
+        movie.setCountry(country);
+
+        language = line.substr(0, line.find('\t')); // gets language
+        line = line.substr(line.find('\t') + 1);
+        movie.setLanguage(language);
+
+        // keep directors in a separate vector
+
+        dirLine = line.substr(0, line.find('\t'));
+        while (dirLine.find(',') != -1) {
+            name = dirLine.substr(0, dirLine.find(','));
+            checkDirectors(directorList, name);
+            movie.addDirector(name);
+            dirLine = dirLine.substr(dirLine.find(',') + 2);
+        }
+        name = dirLine.substr(0, dirLine.find('\t'));
+        checkDirectors(directorList, name);
+        movie.addDirector(name);
+        line = line.substr(line.find('\t') + 1);
+
+        movieList.push_back(movie);
+
+        // test movie object
+        /*cout << movie.getTitle() << endl;
+        cout << movie.getDate() << endl;
+        cout << movie.getGenre() << endl;
+        cout << movie.getDesc() << endl;
+        cout << movie.getVote() << endl;
+        cout << movie.getDuration() << endl;
+        cout << movie.getCountry() << endl;
+        cout << movie.getLanguage() << endl;*/
+    }
+    // movie file data parsing ^^
+    file.close();
+
+    //tt0000009, Miss Jerry, Miss Jerry, 1894, 1894 - 10 - 09, Romance, 45, USA, None, Alexander Black, Alexander Black, Alexander Black Photoplays, "Blanche Bayliss, William Courtenay, Chauncey Depew", The adventures of a female reporter in the 1890s., 5.9, 154, , , , , 1.0, 2.0
+}
+void checkActors(vector<string>& actorList, string _name) { // search for and return an actor object if it exists
+    for (unsigned int i = 0; i < actorList.size(); i++) {
+        if (actorList.at(i) == _name) return;
+    }
+    actorList.push_back(_name);
+}
+void checkDirectors(vector<string>& directorList, string _name) {
+    for (unsigned int i = 0; i < directorList.size(); i++) {
+        if (directorList.at(i) == _name) return;
+    }
+    directorList.push_back(_name);
+}
+Movie::Movie(string _movieID, string _title, string _datePub, string _genre, string _desc) {
+    movieID = _movieID;
+    title = _title;
+    datePub = _datePub;
+    genre = _genre;
+    desc = _desc;
+}
+
+void Movie::setDirectors(vector<string> _directors) {
+    directors = _directors;
+}
+
