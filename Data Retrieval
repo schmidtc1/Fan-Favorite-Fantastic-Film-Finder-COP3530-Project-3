@@ -2,246 +2,163 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-
-
 using namespace std;
-class Movie;
-
-class Actor
-{
-private:
-    vector<Movie> movies; // movies that actors have played in
-    string  name = "", alias = "", dob = "", bio = "";
-public:
-    Actor(string _name);
-    Actor(string _name, string _alias, string _dob, string _bio);
-    void addMovie(Movie& movie);
-    void setAlias(string _alias);
-    void setDOB(string _dob);
-    void setBio(string _bio);
-    string getName();
-    string getAlias();
-};
 
 class Movie
 {
 private:
     string movieID, title, datePub, genre, desc, vote, duration, country, language;
-    vector<Actor> actors; // make an Actor class for actor objects that store the movies they play in and info
+    vector<string> actors; // make an Actor class for actor objects that store the movies they play in and info
     vector<string> directors;
 public:
-    Movie(string _movieID, string _title, string _datePub, string _genre, vector<Actor> _actors, string _desc, vector<string> _directors);
+    Movie(string _movieID, string _title, string _datePub, string _genre, string _desc);
     Movie() {}
-    void addActor(Actor& actor);
-    void setID(string _movieID);
-    void setTitle(string _title);
-    void setDate(string _datePub);
-    void setGenre(string _genre);
-    void setDesc(string _desc);
+    void addActor(string _actor) { actors.push_back(_actor); }
+    void addDirector(string _director) { directors.push_back(_director); }
+    void setID(string _movieID) { movieID = _movieID; }
+    void setTitle(string _title) { title = _title; }
+    void setDate(string _datePub) { datePub = _datePub; }
+    void setGenre(string _genre) { genre = _genre; }
+    void setDesc(string _desc) { desc = _desc; }
     void setDirectors(vector<string> directors);
-    void setVote(string _vote);
-    void setDuration(string _duration);
-    void setCountry(string _country);
-    void setLanguage(string _language);
-
+    void setVote(string _vote) { vote = _vote; }
+    void setDuration(string _duration) { duration = _duration; }
+    void setCountry(string _country) { country = _country; }
+    void setLanguage(string _language) { language = _language; }
+    string getTitle() { return title; }
+    string getDate() { return datePub; }
+    string getGenre() { return genre; }
+    string getDesc() { return desc; }
+    string getVote() { return vote; }
+    string getDuration() { return duration; }
+    string getCountry() { return country; }
+    string getLanguage() { return language; }
+    vector<string> getActors() { return actors; }
+    vector<string> getDirectors() { return directors; }
 };
 
-Actor& searchActor(vector<Actor> actorList, string _name);
+void checkActors(vector<string>& actorList, string _name);
+void checkDirectors(vector<string>& directorList, string _name);
 int main()
 {
-    
+
     ifstream file;
     string header, line;
-    string ID, title, datePub, genre, actorLine, dirLine, desc, actor, vote, duration, country, language, director;
+    string ID, title, datePub, genre, actorLine, dirLine, desc, vote, duration, country, language, director;
     string nameID, alias, name, bio, dob;
-    vector<string> actors;
-    vector<string> directors;
+    vector<string> directorList;
     vector<Movie> movieList;
-    vector<Actor> actorList;
-    file.open("Movie_Files/IMDb movies1.csv");
+    vector<string> actorList;
+
+    file.open("Movie_Files/IMDb movies.txt");
 
     getline(file, header);
     cout << header << endl;
     while (getline(file, line)) {
         Movie movie;
-        ID = line.substr(0, line.find('|')); // gets title ID
-        line = line.substr(line.find('|') + 1);
+        cout << endl;
+        ID = line.substr(0, line.find('\t')); // gets title ID: may not be necessary
+        line = line.substr(line.find('\t') + 1);
         movie.setID(ID);
 
-        title = line.substr(0, line.find('|')); // gets title
-        line = line.substr(line.find('|') + 1);
+        title = line.substr(0, line.find('\t')); // gets title
+        line = line.substr(line.find('\t') + 1);
         movie.setTitle(title);
 
-        datePub = line.substr(0, line.find('|')); // gets date published
-        line = line.substr(line.find('|') + 1);
+        datePub = line.substr(0, line.find('\t')); // gets date published
+        line = line.substr(line.find('\t') + 1);
         movie.setDate(datePub);
 
-        genre = line.substr(0, line.find('|')); // gets genre
-        line = line.substr(line.find('|') + 1);
+        genre = line.substr(0, line.find('\t')); // gets genre
+        line = line.substr(line.find('\t') + 1);
         movie.setGenre(genre);
 
-        actorLine = line.substr(0, line.find('|')); // separate into distinct actor strings and input into vector
+        actorLine = line.substr(0, line.find('\t')); // separate into distinct actor strings and input into vector
         while (actorLine.find(',') != -1) {
-            
             name = actorLine.substr(0, actorLine.find(','));
-           /* Actor curr(name);
-            cout << "test1" << endl;
-            if (curr.getName() == name) {
-                curr.addMovie(movie);
-                movie.addActor(curr);
-            }
-            else {
-                Actor actor(name);
-                movie.addActor(actor);
-                actorList.push_back(actor);
-            }*/
-            cout << "test2" << endl;
+            checkActors(actorList, name);
+            movie.addActor(name);
+            cout << name << endl;
             actorLine = actorLine.substr(actorLine.find(',') + 2);
         }
-        name = actorLine.substr(0, actorLine.find('|'));
-        // PROBLEM: curr.getName() cannot read string, need solution
-        /*Actor& curr = searchActor(actorList, name);
-        if (curr.getName() == name) {
-            curr.addMovie(movie);
-            movie.addActor(curr);
-        }
-        else {
-            Actor actor(name);
-            movie.addActor(actor);
-            actorList.push_back(actor);
-        }*/
-        line = line.substr(line.find('|') + 1); 
-        
-        desc = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1); // .find(string) gives the first index of the string, so you must increment accordingly
+        name = actorLine.substr(0, actorLine.find('\t'));
+        checkActors(actorList, name);
+        movie.addActor(name);
+        cout << name << endl;
+        line = line.substr(line.find('\t') + 1);
+
+        desc = line.substr(0, line.find('\t')); // gets description
+        line = line.substr(line.find('\t') + 1); // .find(string) gives the first index of the string, so you must increment accordingly
         movie.setDesc(desc);
 
-        vote = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
+        vote = line.substr(0, line.find('\t')); // gets vote
+        line = line.substr(line.find('\t') + 1);
         movie.setVote(vote);
 
-        duration = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
+        duration = line.substr(0, line.find('\t')); // gets duration
+        line = line.substr(line.find('\t') + 1);
         movie.setDuration(duration);
 
-        country = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
+        country = line.substr(0, line.find('\t')); // gets country
+        line = line.substr(line.find('\t') + 1);
         movie.setCountry(country);
 
-        language = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
+        language = line.substr(0, line.find('\t')); // gets language
+        line = line.substr(line.find('\t') + 1);
         movie.setLanguage(language);
 
-        dirLine = line.substr(0, line.find('|'));
+        // keep directors in a separate vector
+
+        dirLine = line.substr(0, line.find('\t'));
         while (dirLine.find(',') != -1) {
-            directors.push_back(dirLine.substr(0, dirLine.find(',')));
+            name = dirLine.substr(0, dirLine.find(','));
+            checkDirectors(directorList, name);
+            movie.addDirector(name);
             dirLine = dirLine.substr(dirLine.find(',') + 2);
         }
-        directors.push_back(dirLine.substr(0, dirLine.find('|')));
-        line = line.substr(line.find('|') + 1);
-        movie.setDirectors(directors);
+        name = dirLine.substr(0, dirLine.find('\t'));
+        checkDirectors(directorList, name);
+        movie.addDirector(name);
+        line = line.substr(line.find('\t') + 1);
 
         movieList.push_back(movie);
+
+        // test movie object
+        /*cout << movie.getTitle() << endl;
+        cout << movie.getDate() << endl;
+        cout << movie.getGenre() << endl;
+        cout << movie.getDesc() << endl;
+        cout << movie.getVote() << endl;
+        cout << movie.getDuration() << endl;
+        cout << movie.getCountry() << endl;
+        cout << movie.getLanguage() << endl;*/
     }
     // movie file data parsing ^^
-    
-
-    cout << " test " << endl;
     file.close();
-    file.open("Movie_Files/IMDb names1.csv");
-    getline(file, header);
-    cout << header << endl;
-    while (getline(file, line)) {
-        nameID = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
 
-        alias = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
-
-        name = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
-
-        bio = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
-
-        dob = line.substr(0, line.find('|'));
-        line = line.substr(line.find('|') + 1);
-        break;
-    }
     //tt0000009, Miss Jerry, Miss Jerry, 1894, 1894 - 10 - 09, Romance, 45, USA, None, Alexander Black, Alexander Black, Alexander Black Photoplays, "Blanche Bayliss, William Courtenay, Chauncey Depew", The adventures of a female reporter in the 1890s., 5.9, 154, , , , , 1.0, 2.0
 }
-Actor& searchActor(vector<Actor> actorList, string _name) { // search for and return an actor object if it exists
-    Actor actor(_name);
-    return actor;
+void checkActors(vector<string>& actorList, string _name) { // search for and return an actor object if it exists
+    for (unsigned int i = 0; i < actorList.size(); i++) {
+        if (actorList.at(i) == _name) return;
+    }
+    actorList.push_back(_name);
+}
+void checkDirectors(vector<string>& directorList, string _name) {
+    for (unsigned int i = 0; i < directorList.size(); i++) {
+        if (directorList.at(i) == _name) return;
+    }
+    directorList.push_back(_name);
+}
+Movie::Movie(string _movieID, string _title, string _datePub, string _genre, string _desc) {
+    movieID = _movieID;
+    title = _title;
+    datePub = _datePub;
+    genre = _genre;
+    desc = _desc;
 }
 
-Movie::Movie(string _movieID, string _title, string _datePub, string _genre, vector<Actor> _actors, string _desc, vector<string> _directors) {
-    movieID = _movieID;
-    title = _title;
-    datePub = _datePub;
-    genre = _genre;
-    actors = _actors;
-    desc = _desc;
-    directors = _directors;
-}
-void Movie::addActor(Actor& actor) {
-    actors.push_back(actor);
-}
-void Movie::setID(string _movieID) {
-    movieID = _movieID;
-}
-void Movie::setTitle(string _title) {
-    title = _title;
-}
-void Movie::setDate(string _datePub) {
-    datePub = _datePub;
-}
-void Movie::setGenre(string _genre) {
-    genre = _genre;
-}
-void Movie::setDesc(string _desc) {
-    desc = _desc;
-}
 void Movie::setDirectors(vector<string> _directors) {
     directors = _directors;
 }
-void Movie::setVote(string _vote) {
-    vote = _vote;
-}
-void Movie::setDuration(string _duration) {
-    duration = _duration;
-}
-void Movie::setCountry(string _country) {
-    country = _country;
-}
-void Movie::setLanguage(string _language) {
-    language = _language;
-}
 
-Actor::Actor(string _name) {
-    name = _name;
-}
-Actor::Actor(string _name, string _alias, string _dob, string _bio) {
-    name = _name;
-    alias = _alias;
-    dob = _dob;
-    bio = _bio;
-}
-void Actor::addMovie(Movie& movie) {
-    movies.push_back(movie);
-}
-void Actor::setAlias(string _alias) {
-    alias = _alias;
-}
-void Actor::setDOB(string _dob) {
-    dob = _dob;
-}
-void Actor::setBio(string _bio) {
-    bio = _bio;
-}
-string Actor::getName() {
-    return name;
-}
-string Actor::getAlias() {
-    return alias;
-}
