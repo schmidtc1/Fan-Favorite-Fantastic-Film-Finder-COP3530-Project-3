@@ -2,7 +2,7 @@
 #include <fstream>
 #include <iostream>
 #include <vector>
-#include <set>
+#include <unordered_set>
 #include <queue>
 #include <unordered_map>
 using namespace std;
@@ -16,7 +16,7 @@ private:
 
 public:
     Movie(string _movieID, string _title, string _datePub, string _genre, string _desc);
-    Movie() {}
+    Movie();
     void addActor(string _actor) { actors.push_back(_actor); }
     void addDirector(string _director) { directors.push_back(_director); }
     void setID(string _movieID) { movieID = _movieID; }
@@ -42,18 +42,20 @@ public:
     vector<string> getDirectors() { return directors; }
 };
 
-void checkActors(vector<string> &actorList, string _name);
-void checkDirectors(vector<string> &directorList, string _name);
+void checkActors(vector<string>& actorList, string _name); // not necessary anymore
+void checkDirectors(vector<string>& directorList, string _name); // not necessary anymore
 
 class Graph
 {
 private:
-    unordered_map<string, set<string>> AdjList;
+    unordered_map<string, unordered_set<string>> AdjList;
 
 public:
-    void insertEdge(string src, vector<string> actors, unordered_map<string, vector<string>> actorMap);
-    bool bfs(string src, string tgt, unordered_map<string, string> prev);
+    void insertEdge(string src, const vector<string>& actors, unordered_map<string, vector<string>>& actorMap); // actors vector needs to be const; I get an error when it isn't
+    bool bfs(string src, string tgt, unordered_map<string, string>& prev);
     vector<string> shortestPath(string src, string tgt);
+    Movie& searchMovies(string title, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap);
+
 };
 
 int main()
@@ -62,19 +64,21 @@ int main()
 
     ifstream file;
     string header, line;
-    string ID, title, datePub, genre, actorLine, dirLine, desc, vote, duration, country, language, director;
-    string nameID, alias, name, bio, dob;
+    string ID, title, datePub, genre, actorLine, dirLine, desc, vote, duration, country, language, name;
     vector<string> directorList;
-    vector<Movie> movieList;
+    vector<Movie> movieList(10000);
     vector<string> actorList;
     unordered_map<string, vector<string>> actorMap; //maps actor to movies
     unordered_map<string, Movie> IDmap;             //map ID to movie
     unordered_map<string, string> titleMap;         //map title to ID
     file.open("Movie_Files/IMDb movies.txt");
+    if (!file.is_open()) {
+        cout << "File couldn't be loaded. Check that the file is in the right place!" << endl;
+    }
 
     getline(file, header);
-    // cout << header << endl;
-    while (getline(file, line))
+    int index = 0;
+    while (getline(file, line) && index < 10000)
     {
         Movie movie;
         //  cout << endl;
@@ -98,17 +102,14 @@ int main()
         while (actorLine.find(',') != -1)
         {
             name = actorLine.substr(0, actorLine.find(','));
-            checkActors(actorList, name);
             movie.addActor(name);
             actorMap[name].push_back(ID);
             //   cout << name << endl;
             actorLine = actorLine.substr(actorLine.find(',') + 2);
         }
-        name = actorLine.substr(0, actorLine.find('\t'));
-        checkActors(actorList, name);
+        name = actorLine.substr(0, actorLine.find('\t')); // testing with one actor
         movie.addActor(name);
         actorMap[name].push_back(ID); //map actor to movie
-        //cout << name << endl;
         line = line.substr(line.find('\t') + 1);
 
         desc = line.substr(0, line.find('\t'));  // gets description
@@ -139,16 +140,17 @@ int main()
         while (dirLine.find(',') != -1)
         {
             name = dirLine.substr(0, dirLine.find(','));
-            checkDirectors(directorList, name);
+            //checkDirectors(directorList, name);
             movie.addDirector(name);
             dirLine = dirLine.substr(dirLine.find(',') + 2);
         }
         name = dirLine.substr(0, dirLine.find('\t'));
-        checkDirectors(directorList, name);
+        //checkDirectors(directorList, name);
         movie.addDirector(name);
         line = line.substr(line.find('\t') + 1);
 
-        movieList.push_back(movie);
+        movieList.at(index) = movie;
+        index++;
         // test movie object
         /*cout << movie.getTitle() << endl;
         cout << movie.getDate() << endl;
@@ -162,18 +164,21 @@ int main()
     // movie file data parsing ^^
     file.close();
 
-    //tt0000009, Miss Jerry, Miss Jerry, 1894, 1894 - 10 - 09, Romance, 45, USA, None, Alexander Black, Alexander Black, Alexander Black Photoplays, "Blanche Bayliss, William Courtenay, Chauncey Depew", The adventures of a female reporter in the 1890s., 5.9, 154, , , , , 1.0, 2.0
+    cout << "Movie data retrieved." << endl;
 
     //create adjacency List
     Graph list;
-    for (auto &m : movieList)
+    for (auto& m : movieList)
     {
         list.insertEdge(m.getID(), m.getActors(), actorMap);
     }
+    cout << "Adjacency List created. " << endl;
+
     //testing:
-    string x = "tt1235552";
-    string y = "tt9908390";
+    string x = "tt0003772";
+    string y = "tt0016832";
     vector<string> path = list.shortestPath(x, y);
+    cout << path.size() << endl;
     if (path.size() > 1)
     {
         cout << "path of the movie:" << IDmap[x].getTitle() << " to " << IDmap[y].getTitle() << endl;
@@ -183,10 +188,24 @@ int main()
             cout << IDmap[path[i]].getTitle() << endl;
         }
     }
+
+    // movie search testing: Input movie titles or part of a title to test
+    Movie movie = list.searchMovies("shing", IDmap, titleMap);
+    if (movie.getDesc() == "Movie not found.") {
+        cout << "Movie could not be found. Check the input again." << endl;
+    }
+    else {
+        cout << "Movie found: " << movie.getTitle() << endl;
+        cout << movie.getDesc() << endl;
+        cout << movie.getDate() << endl;
+        cout << movie.getGenre() << endl;
+    }
+   
+    
     return 0;
 }
 
-void checkActors(vector<string> &actorList, string _name)
+void checkActors(vector<string>& actorList, string _name)
 { // search for and return an actor object if it exists
     for (unsigned int i = 0; i < actorList.size(); i++)
     {
@@ -195,7 +214,7 @@ void checkActors(vector<string> &actorList, string _name)
     }
     actorList.push_back(_name);
 }
-void checkDirectors(vector<string> &directorList, string _name)
+void checkDirectors(vector<string>& directorList, string _name)
 {
     for (unsigned int i = 0; i < directorList.size(); i++)
     {
@@ -204,7 +223,19 @@ void checkDirectors(vector<string> &directorList, string _name)
     }
     directorList.push_back(_name);
 }
-Movie::Movie(string _movieID, string _title, string _datePub, string _genre, string _desc)
+Movie::Movie() // default movie object is blank
+{ 
+    movieID = ""; 
+    title = ""; 
+    datePub = ""; 
+    genre = ""; 
+    desc = ""; 
+    vote = ""; 
+    duration = ""; 
+    country = ""; 
+    language = ""; 
+}
+Movie::Movie(string _movieID, string _title, string _datePub, string _genre, string _desc) 
 {
     movieID = _movieID;
     title = _title;
@@ -213,21 +244,23 @@ Movie::Movie(string _movieID, string _title, string _datePub, string _genre, str
     desc = _desc;
 }
 
-void Movie::setDirectors(vector<string> _directors)
+void Movie::setDirectors(vector<string> _directors) // not necessary anymore
 {
     directors = _directors;
 }
 
-void Graph::insertEdge(string src, vector<string> actors, unordered_map<string, vector<string>> actorMap)
+void Graph::insertEdge(string src, const vector<string>& actors, unordered_map<string, vector<string>>& actorMap)
 {
-    for (auto &m : actors)
+    for (auto& m : actors)
     {                               //for every actor in src movie
-        for (auto &n : actorMap[m]) //add edge from src to all movies actor stars in
-            AdjList[src].insert(n);
+        for (auto& n : actorMap[m]) {//add edge from src to all movies actor stars in 
+            AdjList[src].insert(n); 
+            // AdjList[n].insert(src);
+        }
     }
 }
 
-bool Graph::bfs(string src, string tgt, unordered_map<string, string> prev)
+bool Graph::bfs(string src, string tgt, unordered_map<string, string>& prev)
 {
     queue<string> q;
     unordered_map<string, bool> visited;
@@ -237,7 +270,7 @@ bool Graph::bfs(string src, string tgt, unordered_map<string, string> prev)
     {
         string curr = q.front();
         q.pop();
-        for (auto &m : AdjList[curr])
+        for (auto& m : AdjList[curr])
         { //iterate through edges of curr
 
             if (!visited.count(m))
@@ -254,6 +287,7 @@ bool Graph::bfs(string src, string tgt, unordered_map<string, string> prev)
     }
     return false;
 }
+
 vector<string> Graph::shortestPath(string src, string tgt)
 {
     vector<string> result;
@@ -265,10 +299,29 @@ vector<string> Graph::shortestPath(string src, string tgt)
     }
     string curr = tgt;
     result.push_back(curr);
+    cout << prev.size() << endl;
     while (prev.count(curr) > 0)
     { //retrace the path
         result.push_back(prev[curr]);
         curr = prev[curr];
     }
     return result;
+}
+
+Movie& Graph::searchMovies(string title, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap)
+{
+
+    if (titleMap.find(title) != titleMap.end()) {
+        string ID = titleMap[title];
+        return IDmap[ID]; // exact match
+    }
+    else {
+        for (auto it = titleMap.begin(); it != titleMap.end(); it++) {
+            cout << it->first << endl;
+            if (it->first.find(title) != string::npos) return IDmap[it->second]; // closest match
+        }
+    }
+    Movie movie;
+    movie.setDesc("Movie not found."); // no match
+    return movie;
 }
