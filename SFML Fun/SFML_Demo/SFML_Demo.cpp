@@ -41,6 +41,14 @@ int main()
     sf::Text title;
     sf::Text detailLine1;
     sf::Text detailLine2;
+    sf::Text detailLine3;
+    sf::Text detailLine4;
+    sf::Text detailLine5;
+    sf::Text detailLine6;
+    sf::Text detailLine7;
+    sf::Text detailLine8;
+    sf::Text detailLine9;
+    sf::Text detailLine10;
     
     //drawing text
     //text drawn with the help of this SFML tutorial: https://www.sfml-dev.org/tutorials/2.5/graphics-text.php
@@ -57,12 +65,44 @@ int main()
 
     //detail window text
     detailLine1.setFont(fnt);
-    detailLine1.setCharacterSize(120);
+    detailLine1.setCharacterSize(60);
     detailLine1.setFillColor(sf::Color::White);
     detailLine2.setFont(fnt);
-    detailLine2.setCharacterSize(120);
+    detailLine2.setCharacterSize(60);
     detailLine2.setFillColor(sf::Color::White);
     detailLine2.setPosition(sf::Vector2f(0, detailLine1.getPosition().y + detailLine1.getCharacterSize() + 20));
+    detailLine3.setFont(fnt);
+    detailLine3.setCharacterSize(60);
+    detailLine3.setFillColor(sf::Color::White);
+    detailLine3.setPosition(sf::Vector2f(0, detailLine2.getPosition().y + detailLine2.getCharacterSize() + 20));
+    detailLine4.setFont(fnt);
+    detailLine4.setCharacterSize(60);
+    detailLine4.setFillColor(sf::Color::White);
+    detailLine4.setPosition(sf::Vector2f(0, detailLine3.getPosition().y + detailLine3.getCharacterSize() + 20));
+    detailLine5.setFont(fnt);
+    detailLine5.setCharacterSize(60);
+    detailLine5.setFillColor(sf::Color::White);
+    detailLine5.setPosition(sf::Vector2f(0, detailLine4.getPosition().y + detailLine4.getCharacterSize() + 20));
+    detailLine6.setFont(fnt);
+    detailLine6.setCharacterSize(60);
+    detailLine6.setFillColor(sf::Color::White);
+    detailLine6.setPosition(sf::Vector2f(0, detailLine5.getPosition().y + detailLine5.getCharacterSize() + 20));
+    detailLine7.setFont(fnt);
+    detailLine7.setCharacterSize(60);
+    detailLine7.setFillColor(sf::Color::White);
+    detailLine7.setPosition(sf::Vector2f(0, detailLine6.getPosition().y + detailLine6.getCharacterSize() + 20));
+    detailLine8.setFont(fnt);
+    detailLine8.setCharacterSize(60);
+    detailLine8.setFillColor(sf::Color::White);
+    detailLine8.setPosition(sf::Vector2f(0, detailLine7.getPosition().y + detailLine7.getCharacterSize() + 20));
+    detailLine9.setFont(fnt);
+    detailLine9.setCharacterSize(60);
+    detailLine9.setFillColor(sf::Color::White);
+    detailLine9.setPosition(sf::Vector2f(0, detailLine8.getPosition().y + detailLine8.getCharacterSize() + 20));
+    detailLine10.setFont(fnt);
+    detailLine10.setCharacterSize(60);
+    detailLine10.setFillColor(sf::Color::White);
+    detailLine10.setPosition(sf::Vector2f(0, detailLine9.getPosition().y + detailLine9.getCharacterSize() + 20));
     detailWindow.setVisible(false);
 
     //text for inputs
@@ -146,6 +186,8 @@ int main()
                     if (searchToggleButton.getGlobalBounds().contains(position.x, position.y) || toggleTxt.getGlobalBounds().contains(position.x, position.y))
                     {
                         searchToggle = !(searchToggle);
+                        detailWindow.setVisible(false);
+                        showDetails = false;
                     }
 
 
@@ -276,13 +318,36 @@ int main()
             detailWindow.clear();
 
             //different details are displayed depending on which button is selected (searching and separating)
-            detailLine1.setString("Title: ");
-            detailLine2.setString("Release Date: ");
-  
+            if (searchToggle)
+            {
+                detailLine1.setString("Title: ");
+                detailLine2.setString("Release Date: ");
+                detailLine3.setString("Genre: ");
+                detailLine4.setString("IMDB Rating: ");
+                detailLine5.setString("Duration: ");
+                detailLine6.setString("Country: ");
+                detailLine7.setString("Language: ");
+                detailLine8.setString("Director: ");
+                detailLine9.setString("About: ");
 
-            //draw objects
-            detailWindow.draw(detailLine1);
-            detailWindow.draw(detailLine2);
+                //create a loop that will wrap text for the about section
+
+                //draw objects
+                detailWindow.draw(detailLine1);
+                detailWindow.draw(detailLine2);
+                detailWindow.draw(detailLine3);
+                detailWindow.draw(detailLine4);
+                detailWindow.draw(detailLine5);
+                detailWindow.draw(detailLine6);
+                detailWindow.draw(detailLine7);
+                detailWindow.draw(detailLine8);
+                detailWindow.draw(detailLine9);
+            }
+            else
+            {
+                //create loop to display separation
+            }
+  
             detailWindow.display();
         }
     }
