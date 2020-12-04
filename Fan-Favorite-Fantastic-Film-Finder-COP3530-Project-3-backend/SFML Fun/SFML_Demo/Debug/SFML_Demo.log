@@ -1,0 +1,92 @@
+﻿  SFML_Demo.cpp
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(125,81): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(125,69): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(130,82): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(130,70): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(135,87): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(135,75): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(146,91): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(146,79): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(146,155): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+C:\Users\themy\source\repos\SFML Fun\SFML_Demo\SFML_Demo.cpp(146,143): warning C4244: 'argument': conversion from 'T' to 'T', possible loss of data
+          with
+          [
+              T=int
+          ]
+          and
+          [
+              T=float
+          ]
+  SFML_Demo.vcxproj -> C:\Users\themy\source\repos\SFML Fun\Debug\SFML_Demo.exe
