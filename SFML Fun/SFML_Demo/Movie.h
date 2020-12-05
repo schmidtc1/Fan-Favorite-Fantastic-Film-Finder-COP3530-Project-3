@@ -35,5 +35,5 @@ public:
     string getLanguage() { return language; }
     vector<string> getDirectors() { return directors; }
     vector<string> getActors() { return actors; }
-    
+
 };
