@@ -32,9 +32,9 @@ int main()
     sf::RenderWindow mainWindow(sf::VideoMode(1920, 1080), "Film Finder", sf::Style::Titlebar | sf::Style::Close);
     sf::RenderWindow detailWindow(sf::VideoMode(1280, 1280), "Details", sf::Style::Titlebar | sf::Style::Close);
     //middle of my screen is at 860, 540 -Noah (Check if the current placement of the window is off-centered to the left (it worked!) on your end pls)
-    mainWindow.setPosition(sf::Vector2i(320, 540));
+    //mainWindow.setPosition(sf::Vector2i(320, 540));
     //detailWindow's position is mainWindow.x + mainWindow's x size and mainWindow.y - detailWindow overhang
-    detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x + mainWindow.getSize().x, mainWindow.getPosition().y - (detailWindow.getSize().y - mainWindow.getSize().y)));
+    //detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x + mainWindow.getSize().x, mainWindow.getPosition().y - (detailWindow.getSize().y - mainWindow.getSize().y)));
     
     //maybe add details for genre, rating, and language
     sf::Font fnt;
@@ -171,11 +171,15 @@ int main()
                     {
                         txtBox1 = true;
                         txtBox2 = false;
+                        detailWindow.setVisible(false);
+                        showDetails = false;
                     }
                     else if (entry2Txt.getGlobalBounds().contains(position.x, position.y))
                     {
                         txtBox2 = true;
                         txtBox1 = false;
+                        detailWindow.setVisible(false);
+                        showDetails = false;
                     }
                     else
                     {
@@ -320,6 +324,8 @@ int main()
             //different details are displayed depending on which button is selected (searching and separating)
             if (searchToggle)
             {
+                //about is a placeholder description
+                string about = "Though mistreated by her cruel stepmother and stepsisters, Cinderella is able to attend the royal ball through the help of a fairy godmother.";
                 detailLine1.setString("Title: ");
                 detailLine2.setString("Release Date: ");
                 detailLine3.setString("Genre: ");
@@ -329,8 +335,7 @@ int main()
                 detailLine7.setString("Language: ");
                 detailLine8.setString("Director: ");
                 detailLine9.setString("About: ");
-
-                //create a loop that will wrap text for the about section
+                detailLine3.setFillColor(sf::Color::White);
 
                 //draw objects
                 detailWindow.draw(detailLine1);
@@ -342,10 +347,90 @@ int main()
                 detailWindow.draw(detailLine7);
                 detailWindow.draw(detailLine8);
                 detailWindow.draw(detailLine9);
+                
+                //wrapping text
+                //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
+                //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
+                detailLine10.setString(about);
+                //determine if text exceeds bounds of window
+                while (detailLine10.getGlobalBounds().width > detailWindow.getSize().x)
+                {
+                    //loop through all characters if the string
+                    for (int i = 0; i < strlen(about.c_str()); i++)
+                    {
+                        //if a character is outside of the window
+                        if (detailLine10.findCharacterPos(i).x > detailWindow.getSize().x)
+                        {
+                            //if that character is a space, replace it with a newline character
+                            if (about.at(i) == ' ')
+                            {
+                                about.at(i) = '\n';
+                            }
+                            //else find the previous space and replace it with a newline character
+                            else
+                            {
+
+                                string temp = about.substr(0, i + 1);
+                                int pos = temp.find_last_of(' ');
+                                about.at(pos) = '\n';
+                            }
+                            detailLine10.setString(about);
+                        }
+                    }
+                }
+                //draws line
+                detailLine10.setString(about);
+                detailWindow.draw(detailLine10);
+                
             }
             else
             {
-                //create loop to display separation
+                //this is placeholder text
+                string pathText = "Path of the movie: ";
+                string pathToText = entry1 + " to " + entry2;
+                string separation = "Cinderella -> Mary Pickford -> The Little American -> DeWitt Jennings -> Exit Smiling";
+
+                detailLine1.setString(pathText);
+                detailLine2.setString(pathToText);
+
+                //path is in yellow
+                detailLine3.setFillColor(sf::Color::Yellow);
+
+                //wrapping text
+                //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
+                //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
+                detailLine3.setString(separation);
+                //determine if text exceeds bounds of window
+                while (detailLine3.getGlobalBounds().width > detailWindow.getSize().x)
+                {
+                    //loop through all characters if the string
+                    for (int i = 0; i < strlen(separation.c_str()); i++)
+                    {
+                        //if a character is outside of the window
+                        if (detailLine3.findCharacterPos(i).x > detailWindow.getSize().x)
+                        {
+                            //if that character is a space, replace it with a newline character
+                            if (separation.at(i) == ' ')
+                            {
+                                separation.at(i) = '\n';
+                            }
+                            //else find the previous space and replace it with a newline character
+                            else
+                            {
+
+                                string temp = separation.substr(0, i + 1);
+                                int pos = temp.find_last_of(' ');
+                                separation.at(pos) = '\n';
+                            }
+                            detailLine3.setString(separation);
+                        }
+                    }
+                }
+                //draws line
+                detailLine3.setString(separation);
+                detailWindow.draw(detailLine1);
+                detailWindow.draw(detailLine2);
+                detailWindow.draw(detailLine3);
             }
   
             detailWindow.display();
