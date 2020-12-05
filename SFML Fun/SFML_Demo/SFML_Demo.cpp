@@ -1,10 +1,39 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <string>
+#include <fstream>
+#include <vector>
+#include <unordered_set>
+#include <queue>
+#include <unordered_map>
+#include "Movie.h"
+#include "Graph.h"
 using namespace std;
+
+void parseFile(vector<Movie>& movieList, vector<string>& actorList, unordered_map<string,
+    vector<string>>&actorMap, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap);
 
 //Based off of code from the SFML website for creating an SFML Project: https://www.sfml-dev.org/tutorials/2.5/start-vc.php
 int main()
 {
+    // data retrieval: 
+    vector<Movie> movieList(15000);
+    vector<string> actorList;
+    unordered_map<string, vector<string>> actorMap; //maps actor to movies
+    unordered_map<string, Movie> IDmap;             //map ID to movie
+    unordered_map<string, string> titleMap;         //map title to ID
+
+    parseFile(movieList, actorList, actorMap, IDmap, titleMap);
+    cout << "Movie data retrieved." << endl;
+
+    //create adjacency List
+    Graph list;
+    for (auto& m : movieList)
+    {
+        list.insertEdge(m.getID(), m.getActors(), actorMap);
+    }
+    cout << "Adjacency List created. " << endl;
+
     //bools for serach status (false indicates one is searching for separation, true indicates one is searching)
     bool searchToggle = true;
     string search = "Searching";
@@ -32,10 +61,11 @@ int main()
     sf::RenderWindow mainWindow(sf::VideoMode(1920, 1080), "Film Finder", sf::Style::Titlebar | sf::Style::Close);
     sf::RenderWindow detailWindow(sf::VideoMode(1280, 1280), "Details", sf::Style::Titlebar | sf::Style::Close);
     //middle of my screen is at 860, 540 -Noah (Check if the current placement of the window is off-centered to the left (it worked!) on your end pls)
-    //mainWindow.setPosition(sf::Vector2i(320, 540));
+    // Chris: I have to adjust the size for it to fit on my laptop, otherwise the detailWindow does not show
+    mainWindow.setPosition(sf::Vector2i(0, 0));
     //detailWindow's position is mainWindow.x + mainWindow's x size and mainWindow.y - detailWindow overhang
-    //detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x + mainWindow.getSize().x, mainWindow.getPosition().y - (detailWindow.getSize().y - mainWindow.getSize().y)));
-    
+    detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x + mainWindow.getSize().x, mainWindow.getPosition().y - (detailWindow.getSize().y - mainWindow.getSize().y)));
+
     //maybe add details for genre, rating, and language
     sf::Font fnt;
     sf::Text title;
@@ -49,7 +79,10 @@ int main()
     sf::Text detailLine8;
     sf::Text detailLine9;
     sf::Text detailLine10;
-    
+
+    sf::Text detailLine11;
+    sf::Text detailLine12;
+
     //drawing text
     //text drawn with the help of this SFML tutorial: https://www.sfml-dev.org/tutorials/2.5/graphics-text.php
     //Oswald is licensed under the SIL Open Font License OFL: https://scripts.sil.org/cms/scripts/page.php?site_id=nrsi&id=OFL
@@ -59,7 +92,7 @@ int main()
     }
     //title text
     title.setFont(fnt);
-    title.setCharacterSize(120);
+    title.setCharacterSize(100);
     title.setFillColor(sf::Color::White);
     title.setString("Fan-Favorite Fantastic Film Finder");
 
@@ -115,7 +148,7 @@ int main()
     entry1Txt.setPosition(0, title.getPosition().y + title.getCharacterSize() + 20);
     entry2Txt.setPosition(0, entry1Txt.getPosition().y + entry1Txt.getCharacterSize() + 20);
 
-    
+
     //toggle button
     toggleTxt.setFont(fnt);
     toggleTxt.setCharacterSize(60);
@@ -165,6 +198,7 @@ int main()
                     if (goButton.getGlobalBounds().contains(position.x, position.y))
                     {
                         showDetails = true;
+
                     }
                     //allow text entry
                     if (entry1Txt.getGlobalBounds().contains(position.x, position.y))
@@ -288,7 +322,7 @@ int main()
         }
         entry1Txt.setString(entry1);
         entry2Txt.setString(entry2);
-        
+
         //set text within search toggle
         if (searchToggle)
         {
@@ -324,30 +358,27 @@ int main()
             //different details are displayed depending on which button is selected (searching and separating)
             if (searchToggle)
             {
-                //about is a placeholder description
-                string about = "Though mistreated by her cruel stepmother and stepsisters, Cinderella is able to attend the royal ball through the help of a fairy godmother.";
-                detailLine1.setString("Title: ");
-                detailLine2.setString("Release Date: ");
-                detailLine3.setString("Genre: ");
-                detailLine4.setString("IMDB Rating: ");
-                detailLine5.setString("Duration: ");
-                detailLine6.setString("Country: ");
-                detailLine7.setString("Language: ");
-                detailLine8.setString("Director: ");
-                detailLine9.setString("About: ");
-                detailLine3.setFillColor(sf::Color::White);
+                string ID = list.searchMovies(entry1, IDmap, titleMap);
+                Movie movie = IDmap[ID];
+                detailLine1.setString("Title: " + movie.getTitle());
+                detailLine2.setString("Release Date: " + movie.getDate());
+                detailLine3.setString("Genre: " + movie.getGenre());
+                detailLine4.setString("IMDB Rating: " + movie.getVote());
+                detailLine5.setString("Duration: " + movie.getDuration());
+                detailLine6.setString("Country: " + movie.getCountry());
+                detailLine7.setString("Language: " + movie.getLanguage());
 
-                //draw objects
-                detailWindow.draw(detailLine1);
-                detailWindow.draw(detailLine2);
-                detailWindow.draw(detailLine3);
-                detailWindow.draw(detailLine4);
-                detailWindow.draw(detailLine5);
-                detailWindow.draw(detailLine6);
-                detailWindow.draw(detailLine7);
-                detailWindow.draw(detailLine8);
-                detailWindow.draw(detailLine9);
+                string directors = "";
+                for (int i = 0; i < movie.getDirectors().size() - 1; i++) {
+                    directors += movie.getDirectors()[i];
+                    directors += ", ";
+                }
+                directors += movie.getDirectors()[movie.getDirectors().size() - 1];
+                detailLine8.setString("Director: " + directors);
                 
+
+                detailLine9.setString("About: ");
+                string about = movie.getDesc();
                 //wrapping text
                 //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
                 //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
@@ -382,17 +413,35 @@ int main()
                 detailLine10.setString(about);
                 detailWindow.draw(detailLine10);
                 
+                //create a loop that will wrap text for the about section
+
+                //draw objects
+                detailWindow.draw(detailLine1);
+                detailWindow.draw(detailLine2);
+                detailWindow.draw(detailLine3);
+                detailWindow.draw(detailLine4);
+                detailWindow.draw(detailLine5);
+                detailWindow.draw(detailLine6);
+                detailWindow.draw(detailLine7);
+                detailWindow.draw(detailLine8);
+                detailWindow.draw(detailLine9);
             }
             else
             {
-                //this is placeholder text
-                string pathText = "Path of the movie: ";
+                //create loop to display separation
+                
+                string ID1 = titleMap[entry1];
+                string ID2 = titleMap[entry2];
+                vector<string> path = list.shortestPath(ID1, ID2);
+                string pathText = "";
                 string pathToText = entry1 + " to " + entry2;
-                string separation = "Cinderella -> Mary Pickford -> The Little American -> DeWitt Jennings -> Exit Smiling";
-
+                if (path.size() > 1) {
+                    pathText = "Path of the movies: ";
+                }
                 detailLine1.setString(pathText);
                 detailLine2.setString(pathToText);
 
+                string separation = list.connectMovies(IDmap, path);
                 //path is in yellow
                 detailLine3.setFillColor(sf::Color::Yellow);
 
@@ -432,10 +481,105 @@ int main()
                 detailWindow.draw(detailLine2);
                 detailWindow.draw(detailLine3);
             }
-  
+
             detailWindow.display();
         }
     }
 
     return 0;
+}
+
+void parseFile(vector<Movie>& movieList, vector<string>& actorList, unordered_map<string,
+    vector<string>>&actorMap, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap)
+{
+    ifstream file;
+    string header, line;
+    string ID, title, datePub, genre, actorLine, dirLine, desc, vote, duration, country, language, name;
+    file.open("Movie_Files/IMDb movies.txt");
+    if (!file.is_open()) {
+        cout << "File couldn't be loaded. Check that the file is in the right place!" << endl;
+    }
+
+    getline(file, header);
+    int index = 0;
+    while (getline(file, line) && index < 15000) { // can change file entries from 10000-15000 by adjusting index
+        Movie movie;
+        //  cout << endl;
+        ID = line.substr(0, line.find('\t')); // gets title ID: may not be necessary
+        line = line.substr(line.find('\t') + 1);
+        movie.setID(ID);
+
+        title = line.substr(0, line.find('\t')); // gets title
+        line = line.substr(line.find('\t') + 1);
+        movie.setTitle(title);
+
+        datePub = line.substr(0, line.find('\t')); // gets date published
+        line = line.substr(line.find('\t') + 1);
+        movie.setDate(datePub);
+
+        genre = line.substr(0, line.find('\t')); // gets genre
+        line = line.substr(line.find('\t') + 1);
+        movie.setGenre(genre);
+
+        actorLine = line.substr(0, line.find('\t')); // separate into distinct actor strings and input into vector
+        while (actorLine.find(',') != -1)
+        {
+            name = actorLine.substr(0, actorLine.find(','));
+            movie.addActor(name);
+            actorMap[name].push_back(ID);
+            //   cout << name << endl;
+            actorLine = actorLine.substr(actorLine.find(',') + 2);
+        }
+        name = actorLine.substr(0, actorLine.find('\t')); // testing with one actor
+        movie.addActor(name);
+        actorMap[name].push_back(ID); //map actor to movie
+        line = line.substr(line.find('\t') + 1);
+
+        desc = line.substr(0, line.find('\t'));  // gets description
+        line = line.substr(line.find('\t') + 1); // .find(string) gives the first index of the string, so you must increment accordingly
+        movie.setDesc(desc);
+
+        vote = line.substr(0, line.find('\t')); // gets vote
+        line = line.substr(line.find('\t') + 1);
+        movie.setVote(vote);
+
+        duration = line.substr(0, line.find('\t')); // gets duration
+        line = line.substr(line.find('\t') + 1);
+        movie.setDuration(duration);
+
+        country = line.substr(0, line.find('\t')); // gets country
+        line = line.substr(line.find('\t') + 1);
+        movie.setCountry(country);
+
+        language = line.substr(0, line.find('\t')); // gets language
+        line = line.substr(line.find('\t') + 1);
+        movie.setLanguage(language);
+
+        dirLine = line.substr(0, line.find('\t'));
+        while (dirLine.find(',') != -1) {
+            name = actorLine.substr(0, actorLine.find(','));
+            movie.addDirector(name);
+            dirLine = dirLine.substr(dirLine.find(',') + 2);
+        }
+        name = dirLine.substr(0, dirLine.find('\t'));
+        movie.addDirector(name);
+
+
+        titleMap[title] = ID; //map title to the ID
+        IDmap[ID] = movie;    //map the ID to the movie
+
+        movieList.at(index) = movie;
+        index++;
+        // test movie object
+        /*cout << movie.getTitle() << endl;
+        cout << movie.getDate() << endl;
+        cout << movie.getGenre() << endl;
+        cout << movie.getDesc() << endl;
+        cout << movie.getVote() << endl;
+        cout << movie.getDuration() << endl;
+        cout << movie.getCountry() << endl;
+        cout << movie.getLanguage() << endl;*/
+    }
+    // movie file data parsing ^^
+    file.close();
 }
