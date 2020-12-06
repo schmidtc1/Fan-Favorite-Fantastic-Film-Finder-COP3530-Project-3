@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <string>
 #include <fstream>
 #include <vector>
@@ -26,6 +28,10 @@ int main()
     unordered_map<string, Movie> IDmap;             //map ID to movie
     unordered_map<string, string> titleMap;         //map title to ID
 
+    // path containers
+    vector<string> path1;
+    vector<string> path2;
+
     parseFile(movieList, actorList, actorMap, IDmap, titleMap);
     cout << "Movie data retrieved." << endl;
 
@@ -49,9 +55,16 @@ int main()
     sf::Text goTxt;
     sf::RectangleShape goButton;
 
+    //timer variables
+    bool timed1 = false;
+    bool timed2 = false;
+    float time1 = 0.f;
+    float time2 = 0.f;
+
     //variables for search bars
     bool txtBox1 = false;
     bool txtBox2 = false;
+    
     string entry1 = "Click to Enter 1st Film";
     string entry2 = "Click to Enter 2nd Film";
     sf::Text entry1Txt;
@@ -101,42 +114,42 @@ int main()
 
     //detail window text
     detailLine1.setFont(fnt);
-    detailLine1.setCharacterSize(60);
+    detailLine1.setCharacterSize(40);
     detailLine1.setFillColor(sf::Color::White);
     detailLine2.setFont(fnt);
-    detailLine2.setCharacterSize(60);
+    detailLine2.setCharacterSize(40);
     detailLine2.setFillColor(sf::Color::White);
     detailLine2.setPosition(sf::Vector2f(0, detailLine1.getPosition().y + detailLine1.getCharacterSize() + 20));
     detailLine3.setFont(fnt);
-    detailLine3.setCharacterSize(60);
+    detailLine3.setCharacterSize(40);
     detailLine3.setFillColor(sf::Color::White);
     detailLine3.setPosition(sf::Vector2f(0, detailLine2.getPosition().y + detailLine2.getCharacterSize() + 20));
     detailLine4.setFont(fnt);
-    detailLine4.setCharacterSize(60);
+    detailLine4.setCharacterSize(40);
     detailLine4.setFillColor(sf::Color::White);
     detailLine4.setPosition(sf::Vector2f(0, detailLine3.getPosition().y + detailLine3.getCharacterSize() + 20));
     detailLine5.setFont(fnt);
-    detailLine5.setCharacterSize(60);
+    detailLine5.setCharacterSize(40);
     detailLine5.setFillColor(sf::Color::White);
     detailLine5.setPosition(sf::Vector2f(0, detailLine4.getPosition().y + detailLine4.getCharacterSize() + 20));
     detailLine6.setFont(fnt);
-    detailLine6.setCharacterSize(60);
+    detailLine6.setCharacterSize(40);
     detailLine6.setFillColor(sf::Color::White);
     detailLine6.setPosition(sf::Vector2f(0, detailLine5.getPosition().y + detailLine5.getCharacterSize() + 20));
     detailLine7.setFont(fnt);
-    detailLine7.setCharacterSize(60);
+    detailLine7.setCharacterSize(40);
     detailLine7.setFillColor(sf::Color::White);
     detailLine7.setPosition(sf::Vector2f(0, detailLine6.getPosition().y + detailLine6.getCharacterSize() + 20));
     detailLine8.setFont(fnt);
-    detailLine8.setCharacterSize(60);
+    detailLine8.setCharacterSize(40);
     detailLine8.setFillColor(sf::Color::White);
     detailLine8.setPosition(sf::Vector2f(0, detailLine7.getPosition().y + detailLine7.getCharacterSize() + 20));
     detailLine9.setFont(fnt);
-    detailLine9.setCharacterSize(60);
+    detailLine9.setCharacterSize(40);
     detailLine9.setFillColor(sf::Color::White);
     detailLine9.setPosition(sf::Vector2f(0, detailLine8.getPosition().y + detailLine8.getCharacterSize() + 20));
     detailLine10.setFont(fnt);
-    detailLine10.setCharacterSize(60);
+    detailLine10.setCharacterSize(40);
     detailLine10.setFillColor(sf::Color::White);
     detailLine10.setPosition(sf::Vector2f(0, detailLine9.getPosition().y + detailLine9.getCharacterSize() + 20));
     detailWindow.setVisible(false);
@@ -201,7 +214,12 @@ int main()
                     if (goButton.getGlobalBounds().contains(position.x, position.y))
                     {
                         showDetails = true;
-
+                        timed1 = false;
+                        timed2 = false;
+                        path1.clear();
+                        path2.clear();
+                        time1 = 0.f;
+                        time2 = 0.f;
                     }
                     //allow text entry
                     if (entry1Txt.getGlobalBounds().contains(position.x, position.y))
@@ -442,110 +460,147 @@ int main()
                 
                 string ID1 = titleMap[entry1];
                 string ID2 = titleMap[entry2];
-                float time = 0.f;
-                vector<string> path1;
                 
-                bool timed = false;
-                if (!timed) {
+                
+                
+                if (!timed1 && titleMap.find(entry1) != titleMap.end() && titleMap.find(entry1) != titleMap.end()) {
                     auto start = chrono::high_resolution_clock::now();
                     path1 = list.shortestPath(ID1, ID2);
                     auto stop = chrono::high_resolution_clock::now();
                     auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
-                    time = duration.count() / 1000;
-                    timed = true;
+                    time1 = duration.count();
+                    timed1 = true;
                 }
-
                 string pathText1 = "";
                 string pathToText = entry1 + " to " + entry2;
                 if (path1.size() > 1) {
                     pathText1 = "BFS Path of the movies: ";
-                }
-                detailLine1.setString(pathText1);
-                detailLine2.setString(pathToText);
+                    detailLine1.setString(pathText1);
+                    detailLine2.setString(pathToText);
 
-                string separation1 = list.connectMovies(IDmap, path1);
-                //path is in yellow
-                detailLine3.setFillColor(sf::Color::Yellow);
-                detailLine9.setString(to_string(time) + " seconds.");
-                //wrapping text
-                //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
-                //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
-                detailLine3.setString(separation1);
-                //determine if text exceeds bounds of window
-                while (detailLine3.getGlobalBounds().width > detailWindow.getSize().x)
-                {
-                    //loop through all characters if the string
-                    for (int i = 0; i < strlen(separation1.c_str()); i++)
+                    string separation1 = list.connectMovies(IDmap, path1);
+                    //path is in yellow
+                    detailLine3.setFillColor(sf::Color::Yellow);
+                    stringstream precision1;
+                    precision1 << fixed << setprecision(1) << time1;
+                    detailLine4.setString(precision1.str() + " milliseconds.");
+                    //wrapping text
+                    //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
+                    //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
+                    detailLine3.setString(separation1);
+                    //determine if text exceeds bounds of window
+                    while (detailLine3.getGlobalBounds().width > detailWindow.getSize().x)
                     {
-                        //if a character is outside of the window
-                        if (detailLine3.findCharacterPos(i).x > detailWindow.getSize().x)
+                        //loop through all characters if the string
+                        for (int i = 0; i < strlen(separation1.c_str()); i++)
                         {
-                            //if that character is a space, replace it with a newline character
-                            if (separation1.at(i) == ' ')
+                            //if a character is outside of the window
+                            if (detailLine3.findCharacterPos(i).x > detailWindow.getSize().x)
                             {
-                                separation1.at(i) = '\n';
-                            }
-                            //else find the previous space and replace it with a newline character
-                            else
-                            {
+                                //if that character is a space, replace it with a newline character
+                                if (separation1.at(i) == ' ')
+                                {
+                                    separation1.at(i) = '\n';
+                                }
+                                //else find the previous space and replace it with a newline character
+                                else
+                                {
 
-                                string temp = separation1.substr(0, i + 1);
-                                int pos = temp.find_last_of(' ');
-                                separation1.at(pos) = '\n';
+                                    string temp = separation1.substr(0, i + 1);
+                                    int pos = temp.find_last_of(' ');
+                                    separation1.at(pos) = '\n';
+                                }
+                                detailLine3.setString(separation1);
                             }
-                            detailLine3.setString(separation1);
                         }
                     }
+                    
+                    //draws line
+                    detailLine3.setString(separation1);
+                    detailLine4.setPosition(sf::Vector2f(0, detailLine3.getGlobalBounds().height + detailLine3.getCharacterSize() + 90));
+                    detailWindow.draw(detailLine1);
+                    detailWindow.draw(detailLine2);
+                    detailWindow.draw(detailLine3);
+                    detailWindow.draw(detailLine4);
                 }
-                //draws line
-                detailLine3.setString(separation1);
-                detailWindow.draw(detailLine1);
-                detailWindow.draw(detailLine2);
-                detailWindow.draw(detailLine3);
-                detailWindow.draw(detailLine9);
+                else {
+                    pathText1 = "No path found for BFS.";
+                    detailLine1.setString(pathText1);
+                    detailWindow.draw(detailLine1);
+                }
+
                 
-                //string pathText2 = "";
-                //vector<string> path2 = list.shortestPath2(ID1, ID2);
-                //if (path2.size() > 1) {
-                //    pathText2 = "IDFS Path of the movies: ";
-                //}
-                //detailLine5.setString(pathText2);
-                //detailLine6.setString(pathToText);
+                if (!timed2 && titleMap.find(entry1) != titleMap.end() && titleMap.find(entry1) != titleMap.end()) {
+                    auto start = chrono::high_resolution_clock::now();
+                    path2 = list.shortestPath2(ID1, ID2);
+                    auto stop = chrono::high_resolution_clock::now();
+                    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+                    time2 = duration.count();
+                    timed2 = true;
+                }
+                string pathText2 = "";
+                
+                if (path2.size() > 1) {
+                    pathText2 = "IDFS Path of the movies: ";
+                    detailLine5.setString(pathText2);
+                    detailLine6.setString(pathToText);
+                    detailLine5.setPosition(sf::Vector2f(0, detailLine4.getPosition().y + detailLine4.getCharacterSize() + 40));
+                    detailLine6.setPosition(sf::Vector2f(0, detailLine5.getPosition().y + detailLine5.getCharacterSize() + 20));
 
-                //string separation2 = list.connectMovies(IDmap, path2);
-                //detailLine7.setString(separation2);
-                ////determine if text exceeds bounds of window
-                //while (detailLine7.getGlobalBounds().width > detailWindow.getSize().x)
-                //{
-                //    //loop through all characters if the string
-                //    for (int i = 0; i < strlen(separation2.c_str()); i++)
-                //    {
-                //        //if a character is outside of the window
-                //        if (detailLine7.findCharacterPos(i).x > detailWindow.getSize().x)
-                //        {
-                //            //if that character is a space, replace it with a newline character
-                //            if (separation2.at(i) == ' ')
-                //            {
-                //                separation2.at(i) = '\n';
-                //            }
-                //            //else find the previous space and replace it with a newline character
-                //            else
-                //            {
-
-                //                string temp = separation2.substr(0, i + 1);
-                //                int pos = temp.find_last_of(' ');
-                //                separation2.at(pos) = '\n';
-                //            }
-                //            detailLine7.setString(separation2);
-                //        }
-                //    }
-                //}
+                    string separation2 = list.connectMovies(IDmap, path2);
+                    //path is in yellow
+                    detailLine7.setFillColor(sf::Color::Yellow);
+                    stringstream precision2;
+                    precision2 << fixed << setprecision(1) << time2;
+                    detailLine8.setString(precision2.str() + " milliseconds.");
+                    //wrapping text
+                    //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
+                    //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
+                    detailLine7.setString(separation2);
+                    //determine if text exceeds bounds of window
+                    while (detailLine7.getGlobalBounds().width > detailWindow.getSize().x)
+                    {
+                        //loop through all characters if the string
+                        for (int i = 0; i < strlen(separation2.c_str()); i++)
+                        {
+                            //if a character is outside of the window
+                            if (detailLine7.findCharacterPos(i).x > detailWindow.getSize().x)
+                            {
+                                //if that character is a space, replace it with a newline character
+                                if (separation2.at(i) == ' ')
+                                {
+                                    separation2.at(i) = '\n';
+                                }
+                                //else find the previous space and replace it with a newline character
+                                else
+                                {
+                                    string temp = separation2.substr(0, i + 1);
+                                    int pos = temp.find_last_of(' ');
+                                    separation2.at(pos) = '\n';
+                                }
+                                detailLine7.setString(separation2);
+                            }
+                        }
+                    }
+                    //draws line
+                    detailLine7.setString(separation2);
+                    detailLine7.setPosition(sf::Vector2f(0, detailLine6.getPosition().y + detailLine6.getCharacterSize() + 20));
+                    detailLine8.setPosition(sf::Vector2f(0, detailLine7.getPosition().y + detailLine7.getCharacterSize() + 80));
+                    detailWindow.draw(detailLine5);
+                    detailWindow.draw(detailLine6);
+                    detailWindow.draw(detailLine7);
+                    detailWindow.draw(detailLine8);
+                }
+                else {
+                    pathText1 = "No path found for IDFS.";
+                    detailLine5.setString(pathText1);
+                    detailWindow.draw(detailLine5);
+                }
             }
 
             detailWindow.display();
         }
     }
-
     return 0;
 }
 
