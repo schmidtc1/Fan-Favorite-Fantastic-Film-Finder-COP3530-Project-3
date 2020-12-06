@@ -6,6 +6,7 @@
 #include <unordered_set>
 #include <queue>
 #include <unordered_map>
+#include <chrono>
 #include "Movie.h"
 #include "Graph.h"
 using namespace std;
@@ -13,6 +14,8 @@ using namespace std;
 void parseFile(vector<Movie>& movieList, vector<string>& actorList, unordered_map<string,
     vector<string>>&actorMap, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap);
 
+//Timer functionality is based off of the GeeksForGeeks tutorial https://www.geeksforgeeks.org/measure-execution-time-function-cpp/
+//We used the Kaggle movie data set found here: https://www.kaggle.com/stefanoleone992/imdb-extensive-dataset?
 //Based off of code from the SFML website for creating an SFML Project: https://www.sfml-dev.org/tutorials/2.5/start-vc.php
 int main()
 {
@@ -359,72 +362,79 @@ int main()
             if (searchToggle)
             {
                 string ID = list.searchMovies(entry1, IDmap, titleMap);
-                Movie movie = IDmap[ID];
-                detailLine1.setString("Title: " + movie.getTitle());
-                detailLine2.setString("Release Date: " + movie.getDate());
-                detailLine3.setString("Genre: " + movie.getGenre());
-                detailLine4.setString("IMDB Rating: " + movie.getVote());
-                detailLine5.setString("Duration: " + movie.getDuration());
-                detailLine6.setString("Country: " + movie.getCountry());
-                detailLine7.setString("Language: " + movie.getLanguage());
-
-                string directors = "";
-                for (int i = 0; i < movie.getDirectors().size() - 1; i++) {
-                    directors += movie.getDirectors()[i];
-                    directors += ", ";
+                if (ID == "tt0000000") {
+                    detailLine1.setString("Movie not found. Check input again!");
+                    detailWindow.draw(detailLine1);
                 }
-                directors += movie.getDirectors()[movie.getDirectors().size() - 1];
-                detailLine8.setString("Director: " + directors);
-                
+                else {
+                    Movie movie = IDmap[ID];
+                    detailLine1.setString("Title: " + movie.getTitle());
+                    detailLine2.setString("Release Date: " + movie.getDate());
+                    detailLine3.setString("Genre: " + movie.getGenre());
+                    detailLine4.setString("IMDB Rating: " + movie.getVote());
+                    detailLine5.setString("Duration: " + movie.getDuration());
+                    detailLine6.setString("Country: " + movie.getCountry());
+                    detailLine7.setString("Language: " + movie.getLanguage());
 
-                detailLine9.setString("About: ");
-                string about = movie.getDesc();
-                //wrapping text
-                //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
-                //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
-                detailLine10.setString(about);
-                //determine if text exceeds bounds of window
-                while (detailLine10.getGlobalBounds().width > detailWindow.getSize().x)
-                {
-                    //loop through all characters if the string
-                    for (int i = 0; i < strlen(about.c_str()); i++)
+                    string directors = "";
+                    for (int i = 0; i < movie.getDirectors().size() - 1; i++) {
+                        directors += movie.getDirectors()[i];
+                        directors += ", ";
+                    }
+                    directors += movie.getDirectors()[movie.getDirectors().size() - 1];
+                    detailLine8.setString("Director: " + directors);
+
+
+                    detailLine9.setString("About: ");
+                    string about = movie.getDesc();
+                    //wrapping text
+                    //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
+                    //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
+                    detailLine10.setString(about);
+                    //determine if text exceeds bounds of window
+                    while (detailLine10.getGlobalBounds().width > detailWindow.getSize().x)
                     {
-                        //if a character is outside of the window
-                        if (detailLine10.findCharacterPos(i).x > detailWindow.getSize().x)
+                        //loop through all characters if the string
+                        for (int i = 0; i < strlen(about.c_str()); i++)
                         {
-                            //if that character is a space, replace it with a newline character
-                            if (about.at(i) == ' ')
+                            //if a character is outside of the window
+                            if (detailLine10.findCharacterPos(i).x > detailWindow.getSize().x)
                             {
-                                about.at(i) = '\n';
-                            }
-                            //else find the previous space and replace it with a newline character
-                            else
-                            {
+                                //if that character is a space, replace it with a newline character
+                                if (about.at(i) == ' ')
+                                {
+                                    about.at(i) = '\n';
+                                }
+                                //else find the previous space and replace it with a newline character
+                                else
+                                {
 
-                                string temp = about.substr(0, i + 1);
-                                int pos = temp.find_last_of(' ');
-                                about.at(pos) = '\n';
+                                    string temp = about.substr(0, i + 1);
+                                    int pos = temp.find_last_of(' ');
+                                    about.at(pos) = '\n';
+                                }
+                                detailLine10.setString(about);
                             }
-                            detailLine10.setString(about);
                         }
                     }
-                }
-                //draws line
-                detailLine10.setString(about);
-                detailWindow.draw(detailLine10);
-                
-                //create a loop that will wrap text for the about section
+                    //draws line
+                    detailLine10.setString(about);
+                    detailWindow.draw(detailLine10);
 
-                //draw objects
-                detailWindow.draw(detailLine1);
-                detailWindow.draw(detailLine2);
-                detailWindow.draw(detailLine3);
-                detailWindow.draw(detailLine4);
-                detailWindow.draw(detailLine5);
-                detailWindow.draw(detailLine6);
-                detailWindow.draw(detailLine7);
-                detailWindow.draw(detailLine8);
-                detailWindow.draw(detailLine9);
+                    //create a loop that will wrap text for the about section
+
+                    //draw objects
+                    detailWindow.draw(detailLine1);
+                    detailWindow.draw(detailLine2);
+                    detailWindow.draw(detailLine3);
+                    detailWindow.draw(detailLine4);
+                    detailWindow.draw(detailLine5);
+                    detailWindow.draw(detailLine6);
+                    detailWindow.draw(detailLine7);
+                    detailWindow.draw(detailLine8);
+                    detailWindow.draw(detailLine9);
+                }
+                
             }
             else
             {
@@ -432,54 +442,104 @@ int main()
                 
                 string ID1 = titleMap[entry1];
                 string ID2 = titleMap[entry2];
-                vector<string> path = list.shortestPath(ID1, ID2);
-                string pathText = "";
-                string pathToText = entry1 + " to " + entry2;
-                if (path.size() > 1) {
-                    pathText = "Path of the movies: ";
+                float time = 0.f;
+                vector<string> path1;
+                
+                bool timed = false;
+                if (!timed) {
+                    auto start = chrono::high_resolution_clock::now();
+                    path1 = list.shortestPath(ID1, ID2);
+                    auto stop = chrono::high_resolution_clock::now();
+                    auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
+                    time = duration.count() / 1000;
+                    timed = true;
                 }
-                detailLine1.setString(pathText);
+
+                string pathText1 = "";
+                string pathToText = entry1 + " to " + entry2;
+                if (path1.size() > 1) {
+                    pathText1 = "BFS Path of the movies: ";
+                }
+                detailLine1.setString(pathText1);
                 detailLine2.setString(pathToText);
 
-                string separation = list.connectMovies(IDmap, path);
+                string separation1 = list.connectMovies(IDmap, path1);
                 //path is in yellow
                 detailLine3.setFillColor(sf::Color::Yellow);
-
+                detailLine9.setString(to_string(time) + " seconds.");
                 //wrapping text
                 //resources: https://en.sfml-dev.org/forums/index.php?topic=14976.0
                 //https://www.geeksforgeeks.org/5-different-methods-find-length-string-c/
-                detailLine3.setString(separation);
+                detailLine3.setString(separation1);
                 //determine if text exceeds bounds of window
                 while (detailLine3.getGlobalBounds().width > detailWindow.getSize().x)
                 {
                     //loop through all characters if the string
-                    for (int i = 0; i < strlen(separation.c_str()); i++)
+                    for (int i = 0; i < strlen(separation1.c_str()); i++)
                     {
                         //if a character is outside of the window
                         if (detailLine3.findCharacterPos(i).x > detailWindow.getSize().x)
                         {
                             //if that character is a space, replace it with a newline character
-                            if (separation.at(i) == ' ')
+                            if (separation1.at(i) == ' ')
                             {
-                                separation.at(i) = '\n';
+                                separation1.at(i) = '\n';
                             }
                             //else find the previous space and replace it with a newline character
                             else
                             {
 
-                                string temp = separation.substr(0, i + 1);
+                                string temp = separation1.substr(0, i + 1);
                                 int pos = temp.find_last_of(' ');
-                                separation.at(pos) = '\n';
+                                separation1.at(pos) = '\n';
                             }
-                            detailLine3.setString(separation);
+                            detailLine3.setString(separation1);
                         }
                     }
                 }
                 //draws line
-                detailLine3.setString(separation);
+                detailLine3.setString(separation1);
                 detailWindow.draw(detailLine1);
                 detailWindow.draw(detailLine2);
                 detailWindow.draw(detailLine3);
+                detailWindow.draw(detailLine9);
+                
+                //string pathText2 = "";
+                //vector<string> path2 = list.shortestPath2(ID1, ID2);
+                //if (path2.size() > 1) {
+                //    pathText2 = "IDFS Path of the movies: ";
+                //}
+                //detailLine5.setString(pathText2);
+                //detailLine6.setString(pathToText);
+
+                //string separation2 = list.connectMovies(IDmap, path2);
+                //detailLine7.setString(separation2);
+                ////determine if text exceeds bounds of window
+                //while (detailLine7.getGlobalBounds().width > detailWindow.getSize().x)
+                //{
+                //    //loop through all characters if the string
+                //    for (int i = 0; i < strlen(separation2.c_str()); i++)
+                //    {
+                //        //if a character is outside of the window
+                //        if (detailLine7.findCharacterPos(i).x > detailWindow.getSize().x)
+                //        {
+                //            //if that character is a space, replace it with a newline character
+                //            if (separation2.at(i) == ' ')
+                //            {
+                //                separation2.at(i) = '\n';
+                //            }
+                //            //else find the previous space and replace it with a newline character
+                //            else
+                //            {
+
+                //                string temp = separation2.substr(0, i + 1);
+                //                int pos = temp.find_last_of(' ');
+                //                separation2.at(pos) = '\n';
+                //            }
+                //            detailLine7.setString(separation2);
+                //        }
+                //    }
+                //}
             }
 
             detailWindow.display();
