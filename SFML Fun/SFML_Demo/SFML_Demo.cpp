@@ -82,7 +82,7 @@ int main()
     // Chris: I have to adjust the size for it to fit on my laptop, otherwise the detailWindow does not show
     mainWindow.setPosition(sf::Vector2i(0, 0));
     //detailWindow's position is mainWindow.x + mainWindow's x size and mainWindow.y - detailWindow overhang
-    detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x + mainWindow.getSize().x, mainWindow.getPosition().y - (detailWindow.getSize().y - mainWindow.getSize().y)));
+    detailWindow.setPosition(sf::Vector2i(mainWindow.getPosition().x, mainWindow.getPosition().y));
 
     //maybe add details for genre, rating, and language
     sf::Font fnt;
@@ -429,7 +429,7 @@ int main()
                         for (int i = 0; i < strlen(about.c_str()); i++)
                         {
                             //if a character is outside of the window
-                            if (detailLine10.findCharacterPos(i).x > detailWindow.getSize().x)
+                            if (detailLine10.findCharacterPos(i).x > detailWindow.getSize().x - 10)
                             {
                                 //if that character is a space, replace it with a newline character
                                 if (about.at(i) == ' ')
@@ -472,9 +472,15 @@ int main()
             else
             {
                 //create loop to display separation
+                string ID1 = "";
+                string ID2 = "";
+                if (titleMap.find(entry1) != titleMap.end()) {
+                    ID1 = titleMap[entry1];
+                }
+                if (titleMap.find(entry2) != titleMap.end()) {
+                    ID2 = titleMap[entry2];
+                }
                 
-                string ID1 = titleMap[entry1];
-                string ID2 = titleMap[entry2];
                 
                 if (!timed1 && IDmap.find(ID1) != IDmap.end() && IDmap.find(ID2) != IDmap.end()) {
                     auto start = chrono::high_resolution_clock::now();
@@ -506,10 +512,10 @@ int main()
                     //while (detailLine5.getGlobalBounds().width > detailWindow.getSize().x)
                     //{
                         //loop through all characters if the string
-                        for (int i = 0; i < strlen(separation1.c_str()) - 1; i++)
+                        for (int i = 0; i < strlen(separation1.c_str()); i++)
                         {
                             //if a character is outside of the window
-                            if (detailLine5.findCharacterPos(i).x > detailWindow.getSize().x)
+                            if (detailLine5.findCharacterPos(i).x > detailWindow.getSize().x - 10)
                             {
                                 //if that character is a space, replace it with a newline character
                                 if (separation1.at(i) == ' ')
