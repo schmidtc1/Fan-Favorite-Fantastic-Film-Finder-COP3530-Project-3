@@ -1,9 +1,9 @@
 #include "Graph.h"
-void Graph::insertEdge(string src, const vector<string> &actors, unordered_map<string, vector<string>> &actorMap)
+void Graph::insertEdge(string src, const vector<string>& actors, unordered_map<string, vector<string>>& actorMap)
 {
-    for (auto &m : actors)
+    for (auto& m : actors)
     { //for every actor in src movie
-        for (auto &n : actorMap[m])
+        for (auto& n : actorMap[m])
         { //add edge from src to all movies actor stars in
             AdjList[src].insert(n);
             // AdjList[n].insert(src);
@@ -11,7 +11,7 @@ void Graph::insertEdge(string src, const vector<string> &actors, unordered_map<s
     }
 }
 
-bool Graph::bfs(string src, string tgt, unordered_map<string, string> &prev)
+bool Graph::bfs(string src, string tgt, unordered_map<string, string>& prev)
 {
     queue<string> q;
     unordered_map<string, bool> visited;
@@ -21,7 +21,7 @@ bool Graph::bfs(string src, string tgt, unordered_map<string, string> &prev)
     {
         string curr = q.front();
         q.pop();
-        for (auto &m : AdjList[curr])
+        for (auto& m : AdjList[curr])
         { //iterate through edges of curr
 
             if (!visited.count(m))
@@ -58,7 +58,7 @@ vector<string> Graph::shortestPath(string src, string tgt)
     return result;
 }
 
-string Graph::searchMovies(string title, unordered_map<string, Movie> &IDmap, unordered_map<string, string> &titleMap)
+string Graph::searchMovies(string title, unordered_map<string, Movie>& IDmap, unordered_map<string, string>& titleMap)
 {
 
     if (titleMap.find(title) != titleMap.end())
@@ -80,7 +80,7 @@ string Graph::searchMovies(string title, unordered_map<string, Movie> &IDmap, un
     //movie.setDesc("Movie not found.");
     return "tt0000000"; // no match; returns an invalid ID
 }
-bool Graph::dfs(string src, string tgt, int lim, unordered_map<string, string> &prev, unordered_map<string, bool> &visited)
+bool Graph::dfs(string src, string tgt, int lim, unordered_map<string, string>& prev, unordered_map<string, bool>& visited)
 {
     if (src == tgt)
     {
@@ -91,9 +91,9 @@ bool Graph::dfs(string src, string tgt, int lim, unordered_map<string, string> &
     { //if depth limit reached, return
         return false;
     }
-    for (auto &m : AdjList[src])
+    for (auto& m : AdjList[src])
     {                          //iterate through edges
-        if (!visited.count(m)) //if not visited
+        if (!visited[m]) //if not visited
         {
             visited[m] = true; // mark as visited  , this changes the path for some reason?
             prev[m] = src;     //note prev movie
@@ -107,7 +107,7 @@ bool Graph::dfs(string src, string tgt, int lim, unordered_map<string, string> &
     return false;
 }
 
-bool Graph::idfs(string src, string tgt, unordered_map<string, string> &prev)
+bool Graph::idfs(string src, string tgt, unordered_map<string, string>& prev)
 {
     unordered_map<string, bool> visited;
     for (int i = 0; i <= 10; i++)
@@ -142,7 +142,7 @@ vector<string> Graph::shortestPath2(string src, string tgt) // retrace path for 
     }
     return result;
 }
-string Graph::findCommonActor(Movie &film1, Movie &film2)
+string Graph::findCommonActor(Movie& film1, Movie& film2)
 {
     vector<string> actors1 = film1.getActors();
     for (int i = 0; i < film1.getDirectors().size(); i++)
@@ -164,8 +164,9 @@ string Graph::findCommonActor(Movie &film1, Movie &film2)
             }
         }
     }
+    return "";
 }
-string Graph::connectMovies(unordered_map<string, Movie> IDmap, vector<string> &path)
+string Graph::connectMovies(unordered_map<string, Movie> IDmap, vector<string>& path)
 {
     string connection = IDmap[path[path.size() - 1]].getTitle() + " -> ";
     for (int i = path.size() - 2; i > 0; i--)
