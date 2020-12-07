@@ -21,7 +21,7 @@ public:
     bool idfs(string src, string tgt, unordered_map<string, string>& prev);
     vector<string> shortestPath2(string src, string tgt);
     string findCommonActor(Movie& film1, Movie& film2);
-    string connectMovies(unordered_map<string, Movie> IDmap, vector<string>& path);
+    string connectMovies(unordered_map<string, Movie> &IDmap, vector<string>& path);
 };
 
 

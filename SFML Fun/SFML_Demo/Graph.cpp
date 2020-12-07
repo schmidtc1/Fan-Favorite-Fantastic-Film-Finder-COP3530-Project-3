@@ -167,7 +167,7 @@ string Graph::findCommonActor(Movie& film1, Movie& film2)
     }
     return "";
 }
-string Graph::connectMovies(unordered_map<string, Movie>& IDmap, vector<string>& path)
+string Graph::connectMovies(unordered_map<string, Movie> &IDmap, vector<string>& path)
 {
     string connection = IDmap[path[path.size() - 1]].getTitle() + " -> ";
     for (int i = path.size() - 2; i > 0; i--)
