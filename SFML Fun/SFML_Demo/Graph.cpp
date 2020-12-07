@@ -45,7 +45,8 @@ vector<string> Graph::shortestPath(string src, string tgt)
     unordered_map<string, string> prev; //map of prev movie in path
     if (!bfs(src, tgt, prev))
     {
-        cout << "No path exists" << endl;
+        //cout << "No path exists" << endl;
+        return result;
         //  return empty vector
     }
     string curr = tgt;
@@ -68,7 +69,6 @@ string Graph::searchMovies(string title, unordered_map<string, Movie>& IDmap, un
     }
     else
     {
-        cout << "start search" << endl;
         for (auto it = titleMap.begin(); it != titleMap.end(); it++)
         {
             //cout << it->first << endl;
@@ -110,7 +110,7 @@ bool Graph::dfs(string src, string tgt, int lim, unordered_map<string, string>& 
 bool Graph::idfs(string src, string tgt, unordered_map<string, string>& prev)
 {
     unordered_map<string, bool> visited;
-    for (int i = 0; i <= 10; i++)
+    for (int i = 0; i <= 6; i++)
     { //max depth can be changed
         visited.clear();
         prev.clear();
@@ -128,7 +128,8 @@ vector<string> Graph::shortestPath2(string src, string tgt) // retrace path for 
     unordered_map<string, string> prev; //map of prev movie in path
     if (!idfs(src, tgt, prev))
     {
-        cout << "IDFS: No path exists" << endl;
+        //cout << "IDFS: No path exists" << endl;
+        return result;
         //  return empty vector
     }
     // cout << prev.size() << endl;
@@ -166,7 +167,7 @@ string Graph::findCommonActor(Movie& film1, Movie& film2)
     }
     return "";
 }
-string Graph::connectMovies(unordered_map<string, Movie> IDmap, vector<string>& path)
+string Graph::connectMovies(unordered_map<string, Movie>& IDmap, vector<string>& path)
 {
     string connection = IDmap[path[path.size() - 1]].getTitle() + " -> ";
     for (int i = path.size() - 2; i > 0; i--)
@@ -178,3 +179,4 @@ string Graph::connectMovies(unordered_map<string, Movie> IDmap, vector<string>& 
     connection += IDmap[path[0]].getTitle();
     return connection;
 }
+
