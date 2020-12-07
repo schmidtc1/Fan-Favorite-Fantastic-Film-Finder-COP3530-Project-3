@@ -28,11 +28,13 @@ int main()
     unordered_map<string, Movie> IDmap;             //map ID to movie
     unordered_map<string, string> titleMap;         //map title to ID
 
-    // path containers
+    // path stuff
     vector<string> path1;
     vector<string> path2;
     bool IDcheck1 = false;
     bool IDcheck2 = false;
+    bool pathCheck1 = false;
+    bool pathCheck2 = false;
 
     parseFile(movieList, actorList, actorMap, IDmap, titleMap);
     cout << "Movie data retrieved." << endl;
@@ -218,6 +220,8 @@ int main()
                         showDetails = true;
                         timed1 = false;
                         timed2 = false;
+                        pathCheck1 = false;
+                        pathCheck2 = false;
                         path1.clear();
                         path2.clear();
                         time1 = 0.f;
@@ -484,7 +488,10 @@ int main()
                 
                 if (!timed1 && IDmap.find(ID1) != IDmap.end() && IDmap.find(ID2) != IDmap.end()) {
                     auto start = chrono::high_resolution_clock::now();
-                    path1 = list.shortestPath(ID1, ID2);
+                    if (!pathCheck1) {
+                        path1 = list.shortestPath(ID1, ID2);
+                        pathCheck1 = true;
+                    }
                     auto stop = chrono::high_resolution_clock::now();
                     auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
                     time1 = duration.count();
@@ -540,12 +547,15 @@ int main()
                 else {
                     pathText1 = "No path found.";
                     detailLine1.setString(pathText1);
+                    pathCheck2 = true;
                 }
-
                 
                 if (!timed2 && IDmap.find(ID1) != IDmap.end() && IDmap.find(ID2) != IDmap.end()) {
                     auto start = chrono::high_resolution_clock::now();
-                    path2 = list.shortestPath2(ID1, ID2);
+                    if (!pathCheck2) {
+                        path2 = list.shortestPath2(ID1, ID2);
+                        pathCheck2 = true;
+                    }
                     auto stop = chrono::high_resolution_clock::now();
                     auto duration = chrono::duration_cast<chrono::milliseconds>(stop - start);
                     time2 = duration.count();
