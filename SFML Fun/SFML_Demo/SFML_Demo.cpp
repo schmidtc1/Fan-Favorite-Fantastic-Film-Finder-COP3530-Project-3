@@ -407,7 +407,7 @@ int main()
                     detailLine2.setString("Release Date: " + movie.getDate());
                     detailLine3.setString("Genre: " + movie.getGenre());
                     detailLine4.setString("IMDB Rating: " + movie.getVote());
-                    detailLine5.setString("Duration: " + movie.getDuration());
+                    detailLine5.setString("Duration: " + movie.getDuration() + " minutes");
                     detailLine6.setString("Country: " + movie.getCountry());
                     detailLine7.setString("Language: " + movie.getLanguage());
 
@@ -484,6 +484,10 @@ int main()
                 if (titleMap.find(entry2) != titleMap.end()) {
                     ID2 = titleMap[entry2];
                 }
+                if (ID1 == ID2) {
+                    ID1 = "";
+                    ID2 = "";
+                }
                 
                 
                 if (!timed1 && IDmap.find(ID1) != IDmap.end() && IDmap.find(ID2) != IDmap.end()) {
@@ -545,9 +549,16 @@ int main()
                     
                 }
                 else {
-                    pathText1 = "No path found.";
-                    detailLine1.setString(pathText1);
-                    pathCheck2 = true;
+                    if (entry1 == entry2) {
+                        pathText1 = "Identical movies entered. Please submit two different movies.";
+                        detailLine1.setString(pathText1);
+                        pathCheck2 = true;
+                    }
+                    else {
+                        pathText1 = "No path found.";
+                        detailLine1.setString(pathText1);
+                        pathCheck2 = true;
+                    }
                 }
                 
                 if (!timed2 && IDmap.find(ID1) != IDmap.end() && IDmap.find(ID2) != IDmap.end()) {
